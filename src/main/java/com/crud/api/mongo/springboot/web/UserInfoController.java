@@ -9,21 +9,22 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public interface UserInfo {
+@RequestMapping("/api/v1/users")
+public interface UserInfoController {
 
-    @GetMapping("/users")
+    @GetMapping
     List<User> getAllUsers();
 
-    @GetMapping("/users/{id}")
-    Optional<User> getUserById(@PathVariable String id);
+    @GetMapping("/{id}")
+    User getUserById(@PathVariable String id);
 
-    @PostMapping("/users")
+    @PostMapping
     ResponseEntity<Object> createUser(@Valid @RequestBody User user);
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
     ResponseEntity<User> updateUser(@PathVariable String id, @Valid @RequestBody User user);
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     void deleteUserById(@PathVariable String id);
 
 }

@@ -1,6 +1,6 @@
 package com.crud.api.mongo.springboot.web.impl;
 
-import com.crud.api.mongo.springboot.web.UserInfo;
+import com.crud.api.mongo.springboot.web.UserInfoController;
 import com.crud.api.mongo.springboot.model.User;
 import com.crud.api.mongo.springboot.service.impl.UserServiceImpl;
 import jakarta.validation.Valid;
@@ -15,44 +15,45 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class UserInfoImpl implements UserInfo {
+@RequestMapping("/api/v1/users")
+public class UserInfoControllerImpl implements UserInfoController {
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
     private final UserServiceImpl userService;
 
-    public UserInfoImpl(UserServiceImpl userService) {
+    public UserInfoControllerImpl(UserServiceImpl userService) {
         this.userService = userService;
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/users/{id}")
-    public Optional<User> getUserById(@PathVariable String id) {
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable String id) {
         return userService.getUserById(id);
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public ResponseEntity<Object> createUser(@RequestBody @Valid User user) {
-        User savedUser = userService.saveUser(user);
+        String savedUserId = userService.saveUser(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(savedUser.getId())
+                .buildAndExpand(savedUserId)
                 .toUri();
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable String id, @Valid @RequestBody User user) {
-        User updatedUser = userService.updateUser(id, user);
+        String updatedUserId = userService.updateUser(id, user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .buildAndExpand(updatedUser.getId())
+                .buildAndExpand(updatedUserId)
                 .toUri();
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     public void deleteUserById(@PathVariable String id) {
         userService.deleteUserById(id);
     }

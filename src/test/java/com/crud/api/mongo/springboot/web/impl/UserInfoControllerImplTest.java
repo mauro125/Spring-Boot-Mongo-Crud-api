@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(UserInfoImpl.class)
-class UserInfoImplTest {
+@WebMvcTest(UserInfoControllerImpl.class)
+class UserInfoControllerImplTest {
 
-    private static List<User> mockUsers = new ArrayList<User>();
+    private static final List<User> mockUsers = new ArrayList<User>();
     private static User mockUser;
 
     @Autowired
@@ -64,7 +64,7 @@ class UserInfoImplTest {
     @Test
     void getAllUsers() throws Exception {
         Mockito.when(userService.getAllUsers()).thenReturn(mockUsers);
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/users").accept(MediaType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/users").accept(MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         String expected = "[{\"id\":\"1\",\"firstName\":\"James\",\"lastName\":\"Jones\",\"mobCtryCode\":\"+1\",\"mobNumber\":\"1234567890\",\"email\":\"james@gmail.com\",\"address\":{\"address\":\"123 Johnson st\",\"city\":\"Tamarac\",\"state\":\"FL\",\"country\":\"US\"}}," +
                 "{\"id\":\"2\",\"firstName\":\"Wilson\",\"lastName\":\"Smith\",\"mobCtryCode\":\"+5\",\"mobNumber\":\"0987654321\",\"email\":\"wilson@gmail.com\",\"address\":{\"address\":\"123 Johnson st\",\"city\":\"Tamarac\",\"state\":\"FL\",\"country\":\"US\"}}," +
@@ -75,9 +75,9 @@ class UserInfoImplTest {
 
     @Test
     void getUserById() throws Exception {
-        Mockito.when(userService.getUserById(mockUser.getId())).thenReturn(Optional.ofNullable(mockUser));
+        Mockito.when(userService.getUserById(mockUser.getId())).thenReturn(mockUser);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/users/1")
+                .get("/api/v1/users/1")
                 .accept(MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         String expected = "{\"id\":\"1\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"mobCtryCode\":\"+2\",\"mobNumber\":\"1234567890\",\"email\":\"123@gmail.com\",\"address\":{\"address\":\"123 Johnson st\",\"city\":\"Tamarac\",\"state\":\"FL\",\"country\":\"US\"}}";
@@ -86,36 +86,36 @@ class UserInfoImplTest {
 
     @Test
     void createUser() throws Exception {
-        Mockito.when(userService.saveUser(Mockito.any(User.class))).thenReturn(mockUser);
+        Mockito.when(userService.saveUser(Mockito.any(User.class))).thenReturn(mockUser.getId());
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/users")
+                .post("/api/v1/users")
                 .accept(MediaType.APPLICATION_JSON)
                 .content("{\"id\":\"1\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"mobCtryCode\":\"+2\",\"mobNumber\":\"1234567890\",\"email\":\"123@gmail.com\",\"address\":{\"address\":\"123 Johnson st\",\"city\":\"Tamarac\",\"state\":\"FL\",\"country\":\"US\"}}")
                 .contentType(MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         MockHttpServletResponse response = result.getResponse();
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
-        assertEquals("http://localhost/users/1", response.getHeader(HttpHeaders.LOCATION));
+        assertEquals("http://localhost/api/v1/users/1", response.getHeader(HttpHeaders.LOCATION));
     }
 
     @Test
     void updateUser() throws Exception {
-        Mockito.when(userService.updateUser(Mockito.anyString(), Mockito.any(User.class))).thenReturn(mockUser);
+        Mockito.when(userService.updateUser(Mockito.anyString(), Mockito.any(User.class))).thenReturn(mockUser.getId());
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .put("/users/1")
+                .put("/api/v1/users/1")
                 .accept(MediaType.APPLICATION_JSON).content("{\"id\":\"1\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"mobCtryCode\":\"+2\",\"mobNumber\":\"1234567890\",\"email\":\"123@gmail.com\",\"address\":{\"address\":\"123 Johnson st\",\"city\":\"Tamarac\",\"state\":\"FL\",\"country\":\"US\"}}")
                 .contentType(MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         MockHttpServletResponse response = result.getResponse();
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
-        assertEquals("http://localhost/users/1", response.getHeader(HttpHeaders.LOCATION));
+        assertEquals("http://localhost/api/v1/users/1", response.getHeader(HttpHeaders.LOCATION));
     }
 
     @Test
     void deleteUserById() throws Exception {
-        Mockito.when(userService.getUserById(mockUser.getId())).thenReturn(Optional.ofNullable(mockUser));
+        Mockito.when(userService.getUserById(mockUser.getId())).thenReturn(mockUser);
         mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/users/1")
+                        .delete("/api/v1/users/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
