@@ -19,5 +19,4 @@ public class Address {
     private String state;
     @Pattern(regexp = "^[\\w\\-\\s]+$", message = "Invalid country")
     private String country;
-
 }

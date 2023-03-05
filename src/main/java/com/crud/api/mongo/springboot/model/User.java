@@ -2,6 +2,7 @@ package com.crud.api.mongo.springboot.model;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,13 +12,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @ToString
 @Document(collection = "Users")
 @CompoundIndex(def = "{'mobCtryCode':1, 'mobNumber':1, 'email':1}", name = "unique_user", unique = true)
 public class User {
     @Id
     private String id;
-
     @Pattern(regexp = "^[A-Za-z]+$", message = "Invalid First name")
     private String firstName;
     @Pattern(regexp = "^[A-Za-z]+$", message = "Invalid Last name")
@@ -30,14 +31,4 @@ public class User {
     private String email;
     @Valid
     private Address address;
-
-    public User(String id, String firstName, String lastName, String mobCtryCode, String mobNumber, String email, Address address) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.mobCtryCode = mobCtryCode;
-        this.mobNumber = mobNumber;
-        this.email = email;
-        this.address = address;
-    }
 }

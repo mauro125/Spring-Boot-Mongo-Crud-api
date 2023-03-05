@@ -49,6 +49,7 @@ public class UserServiceImpl implements UserService {
     public String updateUser(String id, User updatedUser) {
         deleteUserById(id);
         LOGGER.debug("Updating user with Id: {}", id);
+        updatedUser.setId(id);
         userRepository.save(updatedUser);
         return updatedUser.getId();
     }
