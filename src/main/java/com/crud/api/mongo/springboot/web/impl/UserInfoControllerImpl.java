@@ -1,8 +1,9 @@
 package com.crud.api.mongo.springboot.web.impl;
 
-import com.crud.api.mongo.springboot.web.UserInfoController;
+import com.crud.api.mongo.springboot.dto.UserDTO;
 import com.crud.api.mongo.springboot.model.User;
 import com.crud.api.mongo.springboot.service.impl.UserServiceImpl;
+import com.crud.api.mongo.springboot.web.UserInfoController;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -24,13 +24,23 @@ public class UserInfoControllerImpl implements UserInfoController {
         this.userService = userService;
     }
 
+//    @GetMapping
+//    public List<User> getAllUsers() {
+//        return userService.getAllUsers();
+//    }
+
+//    @GetMapping("{id}")
+//    public User getUserById(@PathVariable String id) {
+//        return userService.getUserById(id);
+//    }
+
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable String id) {
+    @GetMapping("{id}")
+    public UserDTO getUserById(@PathVariable String id) {
         return userService.getUserById(id);
     }
 
@@ -53,7 +63,7 @@ public class UserInfoControllerImpl implements UserInfoController {
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public void deleteUserById(@PathVariable String id) {
         userService.deleteUserById(id);
     }

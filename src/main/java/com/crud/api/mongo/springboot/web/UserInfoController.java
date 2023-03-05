@@ -1,5 +1,6 @@
 package com.crud.api.mongo.springboot.web;
 
+import com.crud.api.mongo.springboot.dto.UserDTO;
 import com.crud.api.mongo.springboot.model.User;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -13,18 +14,18 @@ import java.util.Optional;
 public interface UserInfoController {
 
     @GetMapping
-    List<User> getAllUsers();
+    List<UserDTO> getAllUsers();
 
-    @GetMapping("/{id}")
-    User getUserById(@PathVariable String id);
+    @GetMapping("{id}")
+    UserDTO getUserById(@PathVariable String id);
 
     @PostMapping
     ResponseEntity<Object> createUser(@Valid @RequestBody User user);
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     ResponseEntity<User> updateUser(@PathVariable String id, @Valid @RequestBody User user);
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     void deleteUserById(@PathVariable String id);
 
 }
