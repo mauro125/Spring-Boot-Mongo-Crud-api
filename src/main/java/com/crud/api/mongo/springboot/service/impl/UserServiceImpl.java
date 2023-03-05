@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
 
     public String updateUser(String id, User updatedUserDetails) {
         User updatedUser = userUpdaterIfNullAddPrvValues(updatedUserDetails, id);
-        deleteUserById(id);
+        userRepository.deleteById(id);
         LOGGER.debug("Updating user with Id: {}", id);
         userRepository.save(updatedUser);
         return updatedUser.getId();
