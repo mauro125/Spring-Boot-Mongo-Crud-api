@@ -39,6 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserInfoControllerImplTest {
 
     private static final List<UserDTO> mockUsers = new ArrayList<UserDTO>();
+
+    private static final List<UserDTO> mockUsersPagination = new ArrayList<UserDTO>();
     private static UserDTO mockUser;
     @Autowired
     private MockMvc mockMvc;
@@ -59,6 +61,9 @@ class UserInfoControllerImplTest {
         mockUsers.add(new UserDTO("1", "James", "Jones", "+1", "1234567890", "james@gmail.com", address1, "project1"));
         mockUsers.add(new UserDTO("2", "Wilson", "Smith", "+5", "0987654321", "wilson@gmail.com", address2, "project2"));
         mockUsers.add(new UserDTO("3", "Ted", "Harrison", "+11", "543219876", "ted@gmail.com", address3, "project3"));
+
+        mockUsersPagination.add(new UserDTO("1", "James", "Jones", "+1", "1234567890", "james@gmail.com", address1, "project1"));
+        mockUsersPagination.add(new UserDTO("2", "Wilson", "Smith", "+5", "0987654321", "wilson@gmail.com", address2, "project2"));
     }
 
     char randomPunctuationChar() {
@@ -85,6 +90,18 @@ class UserInfoControllerImplTest {
                 .accept(MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         String expected = "{\"id\":\"1\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"mobCtryCode\":\"+2\",\"mobNumber\":\"1234567890\",\"email\":\"123@gmail.com\",\"address\":{\"address\":\"123 Johnson st\",\"city\":\"Tamarac\",\"state\":\"FL\",\"country\":\"US\"}}";
+        JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
+    }
+
+    @Test
+    void getPaginatedUser() throws Exception {
+        Mockito.when(userService.getAllUsersWithPagination(1, 2)).thenReturn(mockUsersPagination);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/api/v1/users/all-with-pagination?pageNum=1&pageSize=2")
+                .accept(MediaType.APPLICATION_JSON);
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        String expected = "[{\"id\":\"1\",\"firstName\":\"James\",\"lastName\":\"Jones\",\"mobCtryCode\":\"+1\",\"mobNumber\":\"1234567890\",\"email\":\"james@gmail.com\",\"address\":{\"address\":\"123 Johnson st\",\"city\":\"Tamarac\",\"state\":\"FL\",\"country\":\"US\"}}," +
+                "{\"id\":\"2\",\"firstName\":\"Wilson\",\"lastName\":\"Smith\",\"mobCtryCode\":\"+5\",\"mobNumber\":\"0987654321\",\"email\":\"wilson@gmail.com\",\"address\":{\"address\":\"123 Johnson st\",\"city\":\"Tamarac\",\"state\":\"FL\",\"country\":\"US\"}}]";
         JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
     }
 

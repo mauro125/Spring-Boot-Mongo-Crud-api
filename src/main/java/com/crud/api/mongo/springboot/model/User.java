@@ -23,11 +23,11 @@ public class User {
     private String id;
 
     @NotNull(message = "First name is required")
-    @Pattern(regexp = "^[A-Za-z]+$", message = "Invalid First name")
+    @Pattern(regexp = "^[A-Za-z ]+$", message = "Invalid First name")
     private String firstName;
 
     @NotNull(message = "Last name is required")
-    @Pattern(regexp = "^[A-Za-z]+$", message = "Invalid Last name")
+    @Pattern(regexp = "^[A-Za-z ]+$", message = "Invalid Last name")
     private String lastName;
 
     @NotNull(message = "Mobile country code is required")

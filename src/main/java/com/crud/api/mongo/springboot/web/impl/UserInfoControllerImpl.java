@@ -24,19 +24,14 @@ public class UserInfoControllerImpl implements UserInfoController {
         this.userService = userService;
     }
 
-//    @GetMapping
-//    public List<User> getAllUsers() {
-//        return userService.getAllUsers();
-//    }
-
-//    @GetMapping("{id}")
-//    public User getUserById(@PathVariable String id) {
-//        return userService.getUserById(id);
-//    }
-
     @GetMapping
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
+    }
+
+    @GetMapping("/all-with-pagination")
+    public List<UserDTO> getPaginatedUsers(@RequestParam int pageNum, @RequestParam int pageSize) {
+        return userService.getAllUsersWithPagination(pageNum, pageSize);
     }
 
     @GetMapping("{id}")
@@ -54,7 +49,7 @@ public class UserInfoControllerImpl implements UserInfoController {
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public ResponseEntity<User> updateUser(@PathVariable String id, @Valid @RequestBody User user) {
         String updatedUserId = userService.updateUser(id, user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()

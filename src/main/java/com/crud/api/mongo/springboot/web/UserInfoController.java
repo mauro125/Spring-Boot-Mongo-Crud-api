@@ -16,6 +16,9 @@ public interface UserInfoController {
     @GetMapping
     List<UserDTO> getAllUsers();
 
+    @GetMapping("/all-with-pagination")
+    List<UserDTO> getPaginatedUsers(@RequestParam int pageNum, @RequestParam int pageSize);
+
     @GetMapping("{id}")
     UserDTO getUserById(@PathVariable String id);
 

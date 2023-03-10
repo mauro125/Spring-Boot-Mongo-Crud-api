@@ -10,8 +10,11 @@ import com.crud.api.mongo.springboot.repository.UserRepository;
 import com.crud.api.mongo.springboot.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,20 +30,17 @@ public class UserServiceImpl implements UserService {
         this.userDTOMapper = userDTOMapper;
     }
 
-//    public List<User> getAllUsers() {
-//        return userRepository.findAll();
-//    }
-//
-//    public User getUserById(String id) {
-//        return userRepository.findById(id).orElseThrow(() -> {
-//                    LOGGER.error(MessageCodes.USER_NOT_FOUND.getMessage() + ": {}", id);
-//                    return new ResourceNotFoundException(MessageCodes.USER_NOT_FOUND.getMessage());
-//                }
-//        );
-//    }
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll()
+                .stream()
+                .map(userDTOMapper)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getAllUsersWithPagination(int pageNum, int pageSize) {
+        Pageable paging = PageRequest.of(pageNum, pageSize);
+        return userRepository.findAll(paging)
                 .stream()
                 .map(userDTOMapper)
                 .collect(Collectors.toList());
@@ -69,43 +69,36 @@ public class UserServiceImpl implements UserService {
     }
 
     public String updateUser(String id, User updatedUserDetails) {
-        User updatedUser = userUpdaterIfNullAddPrvValues(updatedUserDetails, id);
-        userRepository.deleteById(id);
+        User updatedUser = userUpdateAddPrevValuesIfNull(updatedUserDetails, id);
         LOGGER.debug("Updating user with Id: {}", id);
         userRepository.save(updatedUser);
         return updatedUser.getId();
     }
 
-    private User userUpdaterIfNullAddPrvValues(User newUserDetails, String id) {
+
+    private User userUpdateAddPrevValuesIfNull(User newUserDetails, String id) {
         User userFromDB = userRepository.findById(id).orElseThrow(() -> {
             LOGGER.error(MessageCodes.USER_NOT_FOUND.getMessage() + ": {}", id);
             return new ResourceNotFoundException(MessageCodes.USER_NOT_FOUND.getMessage());
         });
+
         LOGGER.debug(MessageCodes.USING_OLD_VALUES_IF_NULL.getMessage(), id);
+
         newUserDetails.setId(id);
-        if (newUserDetails.getFirstName() == null) {
-            newUserDetails.setFirstName(userFromDB.getFirstName());
-        }
-        if (newUserDetails.getLastName() == null) {
-            newUserDetails.setLastName(userFromDB.getLastName());
-        }
-        if (newUserDetails.getEmail() == null) {
-            newUserDetails.setEmail(userFromDB.getEmail());
-        }
-        if (newUserDetails.getMobCtryCode() == null) {
-            newUserDetails.setMobCtryCode(userFromDB.getMobCtryCode());
-        }
-        if (newUserDetails.getMobNumber() == null) {
-            newUserDetails.setMobNumber(userFromDB.getMobNumber());
-        }
-        if (newUserDetails.getAddress() == null) {
-            newUserDetails.setAddress(userFromDB.getAddress());
-        }
-        if (newUserDetails.getPassword() == null) {
-            newUserDetails.setPassword(userFromDB.getPassword());
-        }
-        if (newUserDetails.getProjectName() == null) {
-            newUserDetails.setProjectName(userFromDB.getProjectName());
+
+//        Field[] fields = User.class.getDeclaredFields();
+
+        for (Field field : User.class.getDeclaredFields()) {
+            try {
+                field.setAccessible(true);
+                Object newValue = field.get(newUserDetails);
+                Object oldValue = field.get(userFromDB);
+                if (newValue == null) {
+                    field.set(newUserDetails, oldValue);
+                }
+            } catch (IllegalAccessException e) {
+                LOGGER.error("Error accessing field: {}", field.getName(), e);
+            }
         }
 
         return newUserDetails;
